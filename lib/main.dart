@@ -38,15 +38,26 @@ class MyApp extends StatelessWidget {
       ],
       theme: ThemeData(visualDensity: VisualDensity.adaptivePlatformDensity),
       home: splashScreen(),
+      onGenerateRoute: (settings) {
+        if (settings.name == Faculty.routeName) {
+          final args = settings.arguments as String;
+
+          return MaterialPageRoute(
+            builder: (context) {
+              return Faculty(
+                universityId: args,
+              );
+            },
+          );
+        }
+      },
       routes: {
         "home": (context) => home(),
         "main": (context) => mainpage(),
         "university": (context) => const University(),
-        Faculty.routeName: (context) =>  Faculty(universityId: '1'),
         "result": (context) => result(),
         department.routeName: (context) => const department(),
-        ContactUs.routeName: (context) =>  ContactUs(),
-
+        ContactUs.routeName: (context) => ContactUs(),
       },
     );
   }

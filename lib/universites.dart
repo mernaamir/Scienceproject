@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import 'facuilites.dart';
 
-
 class University extends StatefulWidget {
   static const String routeName = "university";
 
@@ -26,7 +25,8 @@ class _UniversityState extends State<University> {
 
   Future<void> getData() async {
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("university").get();
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection("university").get();
       data = querySnapshot.docs;
       setState(() => isLoading = false);
     } catch (e) {
@@ -83,7 +83,8 @@ class _UniversityState extends State<University> {
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : hasError
-                      ? const Center(child: Text("Something went errorrrrrrrrr"))
+                      ? const Center(
+                          child: Text("Something went errorrrrrrrrr"))
                       : data.isEmpty
                           ? const Text("List is empty")
                           : getList(),
@@ -101,11 +102,11 @@ class _UniversityState extends State<University> {
       itemBuilder: (context, index) {
         var university = data[index];
 
-
-      return Padding(
+        return Padding(
           padding: const EdgeInsets.all(20.0),
           child: InkWell(
-            onTap: () => Navigator.pushNamed(context,Faculty.routeName,arguments: university.id),
+            onTap: () => Navigator.pushNamed(context, Faculty.routeName,
+                arguments: university.reference.id),
             child: Container(
               width: 265,
               height: 95,
@@ -130,6 +131,4 @@ class _UniversityState extends State<University> {
     );
     return myList;
   }
-
-
 }
