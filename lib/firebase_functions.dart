@@ -1,12 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gradprojec/contact-model.dart';
 
-// class firebaseFunctions{
-//   getData() async {
-//    QuerySnapshot querySnapshot= await FirebaseFirestore.instance.collection("Unversities").get();
-//
-//   }
-// }
 
 class firebaseFunctions{
   static CollectionReference <ContactModel> getcontactCollection()
@@ -19,9 +13,14 @@ class firebaseFunctions{
     });
   }
   static void addcontact(ContactModel contact)
-  {
+ async {
     var collection=getcontactCollection();
     var docRef=collection.doc();
     contact.studID=docRef.id;
-    docRef.set(contact);
+   try{
+     await docRef.set(contact);
+     print("contact added");
+   }catch(e){
+     print("Error added:$e");
+   }
   }}

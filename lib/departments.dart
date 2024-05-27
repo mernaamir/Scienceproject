@@ -1,75 +1,88 @@
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class department extends StatefulWidget {
+class department extends StatelessWidget {
   static const String routeName = "department";
+  final String collegeId;
 
-  const department({super.key});
+  const department({super.key, required this.collegeId});
 
-  @override
-  State<department> createState() => _departmentState();
-}
-
-class _departmentState extends State<department> {
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "قائمة الاقسام",
-          style: TextStyle(
-            fontSize: 28,
-            color: Colors.black,
-          ),
-        ),
+        title: Text("الأقسام"),
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Image.asset(
-                "assets/images/university.png",
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: Container(
-                  height: 300,
-                  width: double.maxFinite,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'الأسم: ${args['name']}',
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('colleges')
+            .doc(collegeId)
+            .collection('department')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+
+          }
+
+          if (snapshot.data!.docs.isEmpty) {
+            return Center(child: Text("لا توجد أقسام"));
+          }
+
+          var depa = snapshot.data!.docs;
+
+          return ListView.separated(
+            separatorBuilder: (context, index) => const SizedBox(height: 1),
+            itemCount: depa.length,
+            itemBuilder: (context, index) {
+              var university = depa[index];
+
+              return Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: InkWell(
+                  onTap:() {
+
+                  },
+                  // Navigator.pushNamed(context, Faculty.routeName,
+                  // arguments: university.reference.id
+                  //
+                  // ),,
+                  child: Container(
+                    width: 265,
+                    height: 95,
+                    decoration: BoxDecoration(
+                      color: const Color(0xff36265D),
+                      borderRadius: BorderRadius.circular(23),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "${depa[index]['name']}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Grade: ${args['grade']}',
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Description: ${args['description']}',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
+              );
+            },
+          );
+
+
+
+          //   ListView.builder(
+          //   itemCount: faculties.length,
+          //   itemBuilder: (context, index) {
+          //     var faculty = faculties[index];
+          //     return ListTile(
+          //       title: Text(faculty['name']),
+          //     );
+          //   },
+          // );
+        },
       ),
     );
   }
@@ -80,178 +93,463 @@ class _departmentState extends State<department> {
 
 
 
-
-
-
-
-
-
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter/cupertino.dart';
 // import 'package:flutter/material.dart';
-// import 'package:flutter/widgets.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 //
-// class department extends StatefulWidget {
-//   static const String routeName = "department";
+// class Faculty extends StatefulWidget {
+//   static const String routeName = "faculty";
 //
-//
-//   const department({super.key,});
+//   const Faculty({super.key});
 //
 //   @override
-//   State<department> createState() => _universityState();
+//   State<Faculty> createState() => _FacultyState();
 // }
 //
-// class _universityState extends State<department> {
+// class _FacultyState extends State<Faculty> {
 //   List<QueryDocumentSnapshot> facdata = [];
-//
-//
-//   void initState() {
-//     super.initState();
-//     // getData();
-//   }
-//   // getData() async {
-//   //   QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("[Faculities]").get();
-//   //   facdata.addAll(querySnapshot.docs);
-//   // }
+//   bool isLoading = false;
+//   bool hasError = false;
 //
 //   @override
+//   void initState() {
+//     super.initState();
+//     getData();
+//   }
 //
+//   Future<void> getData() async {
+//     final String universityId =
+//         ModalRoute.of(context)!.settings.arguments as String;
+//     try {
+//       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+//           .collection('university')
+//           .doc(universityId)
+//           .collection('colleges')
+//           .get();
+//       setState(() {
+//         facdata = querySnapshot.docs;
+//         isLoading = false;
+//       });
+//     } catch (e) {
+//       setState(() {
+//         hasError = true;
+//         isLoading = false;
+//       });
+//     }
+//   }
+//
+//   @override
 //   Widget build(BuildContext context) {
-//     final Map<String, dynamic> args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+//     final String universityId =
+//         ModalRoute.of(context)!.settings.arguments as String;
 //
-//     // TODO: implement build
 //     return Scaffold(
 //       body: Stack(
 //         children: [
-//           Container(
-//             child: Column(
-//               children: [
-//                 Stack(
-//                   children: [
-//                     Image.asset(
-//                       "assets/images/university.png",
-//                       width: double.infinity,
-//                       fit: BoxFit.cover,
+//           Column(
+//             children: [
+//               Stack(
+//                 children: [
+//                   Image.asset(
+//                     "assets/images/university.png",
+//                     width: double.infinity,
+//                     fit: BoxFit.cover,
+//                   ),
+//                   const Positioned(
+//                     bottom: 150,
+//                     right: 20,
+//                     child: Text(
+//                       "قائمة الكليات",
+//                       style: TextStyle(fontSize: 28, color: Colors.white),
 //                     ),
-//                     Positioned(
-//                       bottom: 150,
-//                       right: 20,
-//                       child: Text(
-//                         "قائمة الاقسام",
-//                         style: TextStyle(fontSize: 28, color: Colors.white),
+//                   ),
+//                   Positioned(
+//                     left: 10,
+//                     top: 30,
+//                     child: InkWell(
+//                       onTap: () => Navigator.pop(context),
+//                       child: const Icon(
+//                         Icons.arrow_back,
+//                         size: 30,
+//                         color: Colors.white,
 //                       ),
 //                     ),
-//                     Positioned(
-//                         left: 10,
-//                         top: 30,
-//                         child: InkWell(
-//                             onTap: () {
-//                               Navigator.pop(context);
-//                             },
-//                             child: Icon(
-//                               Icons.arrow_back,
-//                               size: 30,
-//                               color: Colors.white,
-//                             ))),
-//
-//
-// Text(
-//               'name: ${args['name']}',
-//               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-//             ),
-//             SizedBox(height: 10),
-//             Text(
-//               'grade: ${args['grade']}',
-//               style: TextStyle(fontSize: 18),
-//             ),
-//             SizedBox(height: 10),
-//             Text(
-//               'description: ${args['description']}',
-//               style: TextStyle(fontSize: 16),
-//             ),
-//
-//                   ],
-//                 ),
-//               ],
+//                   ),
+//                 ],
+//               ),
+//             ],
+//           ),
+//           Positioned.fill(
+//             child: Container(
+//               height: 650,
+//               decoration: BoxDecoration(
+//                 borderRadius: BorderRadius.circular(50),
+//                 color: Colors.white,
+//               ),
+//               child: isLoading
+//                   ? const Center(child: CircularProgressIndicator())
+//                   : hasError
+//                       ? const Center(child: Text("Something went wrong"))
+//                       : facdata.isEmpty
+//                           ? const Center(child: Text("List is empty"))
+//                           : ListView.builder(
+//                               itemCount: facdata.length,
+//                               itemBuilder: (context, index) {
+//                                 var college = facdata[index];
+//                                 return ListTile(
+//                                   title: Text(college['name']),
+//                                   onTap: () {
+//                                     Navigator.pushNamed(
+//                                       context,
+//                                       'departments', // Assuming you have a Departments route
+//                                       arguments: {
+//                                         'collegeId': college.id,
+//                                         'universityId': universityId,
+//                                       },
+//                                     );
+//                                   },
+//                                 );
+//                               },
+//                             ),
 //             ),
 //           ),
-//
 //         ],
 //       ),
 //     );
 //   }
-//
 // }
-// // Positioned(
-// // bottom: 0,
-// // left: 0,
-// // right: 0,
-// // child: Container(
-// // decoration: BoxDecoration(
-// // borderRadius: BorderRadius.circular(50),
-// // color: Colors.white,
-// // ),
-// // height: 650,
-// // child: Container(
-// // child: Expanded(
-// // child: FutureBuilder(
-// // builder: (context, snapshot) {
-// // if (snapshot.connectionState == ConnectionState.waiting) {
-// // return const Center(
-// // child: CircularProgressIndicator(),
-// // );
-// // }
-// //
-// // if (snapshot.hasError) {
-// // return const Center(
-// // child: Text("Something went errorrrrrrrrr"),
-// // );
-// // }
-// // if (facdata.isEmpty) {
-// // return Center(child: Text("List is empty",style: TextStyle(fontSize: 50),));
-// // }
-// // return getList();
-// // },
-// // future: getData(),
-// // )),
-// // ),
-// // ),
-// // )
+
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:flutter/material.dart';
+// import 'package:gradprojec/departments.dart';
 //
-// // Widget getList() {
-// //   ListView myList = new ListView.separated(
-// //       separatorBuilder: (context, index) => SizedBox(
-// //         height: 1,
-// //       ),
-// //       itemCount: facdata.length,
-// //       itemBuilder: (context, index) {
-// //         return Padding(
-// //           padding: const EdgeInsets.all(20.0),
-// //           child: InkWell(
-// //             onTap: (){
-// //               // Navigator.pushNamed(context, faculty.routeName);
+// class Faculty extends StatefulWidget {
+//   static const String routeName = "faculty";
+//
+//   const Faculty({super.key});
+//
+//   @override
+//   State<Faculty> createState() => _FacultyState();
+// }
+//
+// class _FacultyState extends State<Faculty> {
+//   List<QueryDocumentSnapshot> facdata = [];
+//   bool isLoading = true;
+//   bool hasError = false;
+//
+//   @override
+//   void initState() {
+//     getData();
+//     super.initState();
+//   }
+//
+//   Future<void> getData() async {
+//     try {
+//       QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection(
+//           "university").colletion('colleges')
+//       facdata = querySnapshot.docs;
+//       setState(() => isLoading = false);
+//     } catch (e) {
+//       setState(() => hasError = true);
+//     }
+//   }
+//
+//   // final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final String universityId = ModalRoute.of(context)!.settings.arguments as String;
+//
+//     return Scaffold(
+//       body: Stack(
+//         children: [
+//           Column(
+//             children: [
+//               Stack(
+//                 children: [
+//                   Image.asset(
+//                     "assets/images/university.png",
+//                     width: double.infinity,
+//                     fit: BoxFit.cover,
+//                   ),
+//                   const Positioned(
+//                     bottom: 150,
+//                     right: 20,
+//                     child: Text(
+//                       "قائمة الكليات",
+//                       style: TextStyle(fontSize: 28, color: Colors.white),
+//                     ),
+//                   ),
+//                   Positioned(
+//                     left: 10,
+//                     top: 30,
+//                     child: InkWell(
+//                       onTap: () => Navigator.pop(context),
+//                       child: const Icon(
+//                         Icons.arrow_back,
+//                         size: 30,
+//                         color: Colors.white,
+//                       ),
+//                     ),
+//                   ),
+//                   // Icon(Icons.arrow_back)
+//                 ],
+//               ),
+//             ],
+//           ),
+//           Positioned.fill(
+//             child: Container(
+//                 height: 650,
+//                 decoration: BoxDecoration(
+//                   borderRadius: BorderRadius.circular(50),
+//                   color: Colors.white,
+//                 ),
+//                 child: isLoading
+//                     ? const Center(child: CircularProgressIndicator())
+//                     : hasError
+//                     ? const Center(child: Text("Something went wrong"))
+//                     : facdata.isEmpty
+//                     ? const Text("List is empty")
+//                     : Text('الأس ${args['name']}')
+//             ),
+//           )
+//         ],
+//       ),
+//     );}
+
+// Widget getList() {
+// ListView myList = ListView.builder(
+// itemCount: facdata.length,
+// itemBuilder: (context, index) {
+// return Padding(
+// padding: const EdgeInsets.all(20.0),
+// child: InkWell(
+// onTap: () {
+// Navigator.pushNamed(
+// context,
+// department.routeName,
+// arguments: {
+// 'name': facdata[index]['name'],
+// 'grade': facdata[index]['grade'],
+// 'description': facdata[index]['description'],
+// },
+// );
+// // Navigator.pushNamed(context, department.routeName);
+// },
+// child: Container(
+// width: 265,
+// height: 95,
+// decoration: BoxDecoration(
+// color: const Color(0xff36265D),
+// borderRadius: BorderRadius.circular(23),
+// ),
+// child: Center(
+// child: Text('${facdata[index]['name']}',
+// // "${facdata[index]['name']}",
+// style: const TextStyle(
+// color: Colors.white,
+// fontSize: 20,
+// fontWeight: FontWeight.w700,
+// ),
+// ),
+// ),
+// ),
+// ),
+// );
+// },
+// );
+// return myList;
+// }
+//   }
+
+//
+// class Faculty extends StatelessWidget {
+//   static const String routeName = "Faculty";
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final String universityId = ModalRoute.of(context)!.settings.arguments as String;
+//
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Colleges'),
+//       ),
+//       body: StreamBuilder(
+//         stream: FirebaseFirestore.instance
+//             .collection('universities')
+//             .doc(universityId)
+//             .collection('colleges')
+//             .snapshots(),
+//         builder: (context, snapshot) {
+//           if (!snapshot.hasData) {
+//             return Center(child: CircularProgressIndicator());
+//           }
+//           var colleges = snapshot.data!.docs;
+//           return ListView.builder(
+//             itemCount: colleges.length,
+//             itemBuilder: (context, index) {
+//               var college = colleges[index];
+//               return ListTile(
+//                 title: Text(college['name']),
+//               );
+//             },
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+// // import 'package:cloud_firestore/cloud_firestore.dart';
+// // import 'package:flutter/material.dart';
+// // import 'package:gradprojec/departments.dart';
 // //
-// //             },
-// //             child: Container(
-// //               width: 265.w,
-// //               height: 95.h,
-// //               decoration: BoxDecoration(
-// //                 color: Color(0xff36265D),
-// //                 borderRadius: BorderRadius.circular(23),
-// //               ),
-// //               child: Center(
-// //                 child: Text(
-// //                   "${facdata[index]['name']}",
-// //                   style: TextStyle(
-// //                       color: Colors.white,
-// //                       fontSize: 20,
-// //                       fontWeight: FontWeight.w700),
-// //                 ),
-// //               ),
-// //             ),
-// //           ),
-// //         );
-// //       });
-// //   return myList;
+// // class Faculty extends StatefulWidget {
+// //   static const String routeName = "faculty";
+// //
+// //   const Faculty({super.key});
+// //
+// //   @override
+// //   State<Faculty> createState() => _FacultyState();
 // // }
+// //
+// // class _FacultyState extends State<Faculty> {
+// //   List<QueryDocumentSnapshot> facdata = [];
+// //   bool isLoading = true;
+// //   bool hasError = false;
+// //
+// //   @override
+// //   void initState() {
+// //     getData();
+// //     super.initState();
+// //   }
+// //
+// //   Future<void> getData() async {
+// //     try {
+// //       QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection(
+// //           "university").colletion('')
+// //       facdata = querySnapshot.docs;
+// //       setState(() => isLoading = false);
+// //     } catch (e) {
+// //       setState(() => hasError = true);
+// //     }
+// //   }
+// //
+// //   // final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+// //
+// //   @override
+// //   Widget build(BuildContext context) {
+// //     final String universityId = ModalRoute.of(context)!.settings.arguments as String;
+// //
+// //     return Scaffold(
+// //       body: Stack(
+// //         children: [
+// //           Column(
+// //             children: [
+// //               Stack(
+// //                 children: [
+// //                   Image.asset(
+// //                     "assets/images/university.png",
+// //                     width: double.infinity,
+// //                     fit: BoxFit.cover,
+// //                   ),
+// //                   const Positioned(
+// //                     bottom: 150,
+// //                     right: 20,
+// //                     child: Text(
+// //                       "قائمة الكليات",
+// //                       style: TextStyle(fontSize: 28, color: Colors.white),
+// //                     ),
+// //                   ),
+// //                   Positioned(
+// //                     left: 10,
+// //                     top: 30,
+// //                     child: InkWell(
+// //                       onTap: () => Navigator.pop(context),
+// //                       child: const Icon(
+// //                         Icons.arrow_back,
+// //                         size: 30,
+// //                         color: Colors.white,
+// //                       ),
+// //                     ),
+// //                   ),
+// //                   // Icon(Icons.arrow_back)
+// //                 ],
+// //               ),
+// //             ],
+// //           ),
+// //           Positioned.fill(
+// //             child: Container(
+// //                 height: 650,
+// //                 decoration: BoxDecoration(
+// //                   borderRadius: BorderRadius.circular(50),
+// //                   color: Colors.white,
+// //                 ),
+// //                 child: isLoading
+// //                     ? const Center(child: CircularProgressIndicator())
+// //                     : hasError
+// //                     ? const Center(child: Text("Something went wrong"))
+// //                     : facdata.isEmpty
+// //                     ? const Text("List is empty")
+// //                     : Text('الأس ${args['name']}')
+// //             ),
+// //           )
+// //         ],
+// //       ),
+// //     );}
+// //
+// //     // Widget getList() {
+// //     // ListView myList = ListView.builder(
+// //     // itemCount: facdata.length,
+// //     // itemBuilder: (context, index) {
+// //     // return Padding(
+// //     // padding: const EdgeInsets.all(20.0),
+// //     // child: InkWell(
+// //     // onTap: () {
+// //     // Navigator.pushNamed(
+// //     // context,
+// //     // department.routeName,
+// //     // arguments: {
+// //     // 'name': facdata[index]['name'],
+// //     // 'grade': facdata[index]['grade'],
+// //     // 'description': facdata[index]['description'],
+// //     // },
+// //     // );
+// //     // // Navigator.pushNamed(context, department.routeName);
+// //     // },
+// //     // child: Container(
+// //     // width: 265,
+// //     // height: 95,
+// //     // decoration: BoxDecoration(
+// //     // color: const Color(0xff36265D),
+// //     // borderRadius: BorderRadius.circular(23),
+// //     // ),
+// //     // child: Center(
+// //     // child: Text('${facdata[index]['name']}',
+// //     // // "${facdata[index]['name']}",
+// //     // style: const TextStyle(
+// //     // color: Colors.white,
+// //     // fontSize: 20,
+// //     // fontWeight: FontWeight.w700,
+// //     // ),
+// //     // ),
+// //     // ),
+// //     // ),
+// //     // ),
+// //     // );
+// //     // },
+// //     // );
+// //     // return myList;
+// //     // }
+// //   }

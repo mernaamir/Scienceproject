@@ -1,6 +1,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gradprojec/departments.dart';
 
 class Faculty extends StatelessWidget {
   static const String routeName = "faculty";
@@ -32,15 +33,58 @@ class Faculty extends StatelessWidget {
 
           var faculties = snapshot.data!.docs;
 
-          return ListView.builder(
+          return ListView.separated(
+            separatorBuilder: (context, index) => const SizedBox(height: 1),
             itemCount: faculties.length,
             itemBuilder: (context, index) {
-              var faculty = faculties[index];
-              return ListTile(
-                title: Text(faculty['name']),
+              var university = faculties[index];
+
+              return Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: InkWell(
+                  onTap:() {
+                    Navigator.pushNamed(context, department.routeName,
+                        arguments: "collegeId");
+
+                  },
+                      // Navigator.pushNamed(context, Faculty.routeName,
+                      // arguments: university.reference.id
+                      //
+                      // ),,
+                  child: Container(
+                    width: 265,
+                    height: 95,
+                    decoration: BoxDecoration(
+                      color: const Color(0xff36265D),
+                      borderRadius: BorderRadius.circular(23),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "${faculties[index]['name']}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               );
             },
           );
+
+
+
+          //   ListView.builder(
+          //   itemCount: faculties.length,
+          //   itemBuilder: (context, index) {
+          //     var faculty = faculties[index];
+          //     return ListTile(
+          //       title: Text(faculty['name']),
+          //     );
+          //   },
+          // );
         },
       ),
     );
